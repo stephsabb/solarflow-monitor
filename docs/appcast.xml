@@ -14,9 +14,9 @@
       <description sparkle:format="plain-text">Première version publique avec mises à jour automatiques Sparkle, prévisions solaires Open-Meteo, historique Zendure et intégration Shelly.</description>
       <enclosure
         url="https://github.com/stephsabb/solarflow-monitor/releases/download/v5.37/SolarFlow-Monitor-App.zip"
-        length="1954098"
+        length="2001509"
         type="application/octet-stream"
-        sparkle:edSignature="ls9H4LAoeBd6A74yTju6BbjmGbYL6awnzbKeiJkcUD6ts2dXcPZiiXnHg2Ook0Wxp0jto+7n95k0FlwTWaOnBQ==" />
+        sparkle:edSignature="AOykBh06KZd2VD+viNYHklScU4iKS1+IXBlWNs3YEXhnKFZKm3rTaa+o32p3LEvIEFH/mmcsYNgDHKJbXjdiAQ==" />
     </item>
   </channel>
 </rss>
