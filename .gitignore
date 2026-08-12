@@ -1,0 +1,13 @@
+.build/
+.swiftpm/
+xcuserdata/
+.DS_Store
+outputs/
+work/previous-build-*/
+work/previous-build/
+work/clang-cache/
+work/swift-cache/
+work/gh-config/
+work/AppIcon.iconset/
+work/AppIcon-tiff/
+work/AppIcon.tiff
