@@ -8,5 +8,7 @@ archive="$project_dir/outputs/SolarFlow-Monitor-App.zip"
 "$project_dir/Scripts/build-release.sh"
 if [[ -n "${NOTARY_PROFILE:-}" ]]; then xcrun notarytool submit "$archive" --keychain-profile "$NOTARY_PROFILE" --wait; fi
 gh release create "v$version" "$archive#SolarFlow-Monitor-App.zip" --repo "$owner/$repository" --title "SolarFlow Monitor $version" --generate-notes
-"$project_dir/.build/artifacts/sparkle/Sparkle/bin/generate_appcast" --download-url-prefix "https://github.com/$owner/$repository/releases/download/v$version/" --link "https://$owner.github.io/$repository/" -o "$project_dir/docs/appcast.xml" "$project_dir/outputs"
+feed_dir=$(mktemp -d /private/tmp/solarflow-feed.XXXXXX)
+cp "$archive" "$feed_dir/SolarFlow-Monitor-App.zip"
+"$project_dir/.build/artifacts/sparkle/Sparkle/bin/generate_appcast" --account solarflow-monitor --download-url-prefix "https://github.com/$owner/$repository/releases/download/v$version/" --link "https://$owner.github.io/$repository/" -o "$project_dir/docs/appcast.xml" "$feed_dir"
 echo "Release publiée. Catalogue : https://$owner.github.io/$repository/appcast.xml"

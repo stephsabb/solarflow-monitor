@@ -34,6 +34,8 @@
     <true/>
     <key>SUAutomaticallyUpdate</key>
     <true/>
+    <key>SUPublicEDKey</key>
+    <string>Ck4xG8FqSZqyGk6ssYCWj4JTpE7t2UtWWZNW5Ub5nIA=</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
 </dict>
