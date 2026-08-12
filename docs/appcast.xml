@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"><channel>
-<title>SolarFlow Monitor</title><link>https://stephsabb.github.io/solarflow-monitor/</link>
-<description>Mises à jour de SolarFlow Monitor</description>
-<!-- Ce fichier est remplacé par Scripts/publish-release.sh. -->
-</channel></rss>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>SolarFlow Monitor</title>
+    <link>https://stephsabb.github.io/solarflow-monitor/</link>
+    <description>Mises à jour de SolarFlow Monitor</description>
+    <language>fr</language>
+    <item>
+      <title>SolarFlow Monitor 5.37</title>
+      <pubDate>Wed, 12 Aug 2026 16:30:00 +0200</pubDate>
+      <sparkle:version>66</sparkle:version>
+      <sparkle:shortVersionString>5.37</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description sparkle:format="plain-text">Première version publique avec mises à jour automatiques Sparkle, prévisions solaires Open-Meteo, historique Zendure et intégration Shelly.</description>
+      <enclosure
+        url="https://github.com/stephsabb/solarflow-monitor/releases/download/v5.37/SolarFlow-Monitor-App.zip"
+        length="1954098"
+        type="application/octet-stream"
+        sparkle:edSignature="ls9H4LAoeBd6A74yTju6BbjmGbYL6awnzbKeiJkcUD6ts2dXcPZiiXnHg2Ook0Wxp0jto+7n95k0FlwTWaOnBQ==" />
+    </item>
+  </channel>
+</rss>
