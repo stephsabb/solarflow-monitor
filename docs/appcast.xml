@@ -6,17 +6,17 @@
     <description>Mises à jour de SolarFlow Monitor</description>
     <language>fr</language>
     <item>
-      <title>SolarFlow Monitor 5.37</title>
-      <pubDate>Wed, 12 Aug 2026 16:30:00 +0200</pubDate>
-      <sparkle:version>66</sparkle:version>
-      <sparkle:shortVersionString>5.37</sparkle:shortVersionString>
+      <title>SolarFlow Monitor 5.38</title>
+      <pubDate>Wed, 12 Aug 2026 20:10:00 +0200</pubDate>
+      <sparkle:version>67</sparkle:version>
+      <sparkle:shortVersionString>5.38</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-      <description sparkle:format="plain-text">Première version publique avec mises à jour automatiques Sparkle, prévisions solaires Open-Meteo, historique Zendure et intégration Shelly.</description>
+      <description sparkle:format="plain-text">Le contrôle des mises à jour est désormais regroupé dans Configuration → Interface. L’adresse technique du catalogue Sparkle n’est plus affichée.</description>
       <enclosure
-        url="https://github.com/stephsabb/solarflow-monitor/releases/download/v5.37/SolarFlow-Monitor-App.zip"
-        length="2001509"
+        url="https://github.com/stephsabb/solarflow-monitor/releases/download/v5.38/SolarFlow-Monitor-App.zip"
+        length="2003273"
         type="application/octet-stream"
-        sparkle:edSignature="AOykBh06KZd2VD+viNYHklScU4iKS1+IXBlWNs3YEXhnKFZKm3rTaa+o32p3LEvIEFH/mmcsYNgDHKJbXjdiAQ==" />
+        sparkle:edSignature="3PDMf95wcf6EworLaiMvW2ldN4LPh+3KRcubshlqdIdrFi9Xp4VifbQaxR5nEP/iOf2Z5x4OWAGnb4B0985yAw==" />
     </item>
   </channel>
 </rss>

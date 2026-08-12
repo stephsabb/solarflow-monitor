@@ -11,7 +11,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if showingSettings {
-                SettingsView(configuration: $model.configuration, onCancel: {
+                SettingsView(configuration: $model.configuration, updates: updates, onCancel: {
                     showingSettings = false
                 }) {
                     showingSettings = false
@@ -61,12 +61,6 @@ struct ContentView: View {
             Button("Configuration", systemImage: "gearshape") { showingSettings = true }
                 .labelStyle(.iconOnly)
                 .help("Configuration")
-            Button("Rechercher les mises à jour", systemImage: "arrow.triangle.2.circlepath") {
-                updates.checkForUpdates()
-            }
-            .labelStyle(.iconOnly)
-            .help(updates.isConfigured ? "Rechercher les mises à jour" : "Configurez le catalogue dans Interface")
-            .disabled(!updates.canCheckForUpdates)
             Button("Quitter", systemImage: "power") { NSApplication.shared.terminate(nil) }
                 .labelStyle(.iconOnly)
                 .help("Quitter SolarFlow Monitor")

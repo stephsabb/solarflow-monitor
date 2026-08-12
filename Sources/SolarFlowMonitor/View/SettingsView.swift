@@ -28,12 +28,14 @@ struct SettingsView: View {
 
     @State private var draft: CloudConfiguration
     @State private var selectedTab: Tab = .solar
+    @ObservedObject var updates: UpdateController
     private let configuration: Binding<CloudConfiguration>
     let onCancel: () -> Void
     let onSave: () -> Void
 
-    init(configuration: Binding<CloudConfiguration>, onCancel: @escaping () -> Void, onSave: @escaping () -> Void) {
+    init(configuration: Binding<CloudConfiguration>, updates: UpdateController, onCancel: @escaping () -> Void, onSave: @escaping () -> Void) {
         self.configuration = configuration
+        self.updates = updates
         self._draft = State(initialValue: configuration.wrappedValue)
         self.onCancel = onCancel
         self.onSave = onSave
@@ -177,14 +179,18 @@ struct SettingsView: View {
                     .settingsHelp()
             }
             SettingsSection(title: "Mises à jour", icon: "arrow.triangle.2.circlepath") {
-                SettingsField("Adresse du catalogue Sparkle") {
-                    TextField("https://…/appcast.xml", text: $draft.updateFeedURL)
-                }
                 Toggle("Rechercher automatiquement les nouvelles versions", isOn: $draft.automaticallyChecksForUpdates)
                     .font(.caption)
                     .padding(.horizontal, 7)
-                Text("Le catalogue HTTPS est publié avec le site GitHub Pages.")
-                    .settingsHelp()
+                Button {
+                    updates.checkForUpdates()
+                } label: {
+                    Label("Rechercher les mises à jour", systemImage: "arrow.triangle.2.circlepath")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(!updates.canCheckForUpdates)
             }
         }
     }
