@@ -38,4 +38,6 @@ git commit -m 'Publie la nouvelle version'
 git push
 ```
 
-Le script compile l’app, embarque Sparkle, signe le paquet, crée la GitHub Release et régénère le catalogue.
+Le script compile l’app, embarque Sparkle, signe le paquet, le soumet à Apple,
+agrafe et vérifie le ticket de notarisation, recrée l’archive notarifiée, crée la
+GitHub Release et régénère le catalogue.
