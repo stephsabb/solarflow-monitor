@@ -1,5 +1,235 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SolarFlow Monitor pour macOS</title><style>
-:root{color-scheme:light dark;font-family:-apple-system,BlinkMacSystemFont,sans-serif}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#ececec;color:#303034}main{max-width:680px;margin:30px;padding:42px;border-radius:28px;background:#fffd;box-shadow:0 18px 60px #0002;text-align:center}img{width:128px;border-radius:28px}h1{margin:18px 0 8px}p{color:#65656b;line-height:1.5}a{display:inline-block;margin-top:16px;padding:12px 20px;border-radius:12px;background:#0878ff;color:#fff;text-decoration:none;font-weight:650}@media(prefers-color-scheme:dark){body{background:#171719;color:#eee}main{background:#242428}p{color:#aaa}}
-</style></head><body><main><img src="icon.png" alt="Icône SolarFlow Monitor"><h1>SolarFlow Monitor</h1><p>Suivez vos SolarFlow, votre consommation Shelly, la météo et les prévisions de production depuis la barre des menus de macOS.</p><a href="https://github.com/stephsabb/solarflow-monitor/releases/latest/download/SolarFlow-Monitor-App.zip">Télécharger la dernière version</a><p>macOS 15 ou version ultérieure · Mise à jour automatique intégrée</p></main></body></html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="SolarFlow Monitor : suivez gratuitement votre installation Zendure, votre consommation Shelly et vos prévisions solaires depuis la barre des menus de macOS.">
+  <meta name="theme-color" content="#111316">
+  <title>SolarFlow Monitor — Votre énergie, simplement sur Mac</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0f;
+      --panel: #14171a;
+      --panel-2: #1b1f23;
+      --text: #f5f6f7;
+      --muted: #a4a9af;
+      --line: rgba(255,255,255,.09);
+      --yellow: #ffc400;
+      --orange: #ff7a16;
+      --green: #22cb62;
+      --blue: #1687ff;
+      --max: 1160px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    .nav {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(11,13,15,.78); backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner { max-width: var(--max); margin: auto; padding: 13px 24px; display: flex; align-items: center; gap: 14px; }
+    .nav img { width: 38px; height: 38px; border-radius: 10px; }
+    .brand { font-weight: 750; letter-spacing: -.02em; }
+    .nav-links { margin-left: auto; display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: 14px; }
+    .nav-links a { text-decoration: none; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      padding: 13px 20px; border-radius: 13px; text-decoration: none; font-weight: 720;
+      background: var(--blue); color: white; box-shadow: 0 10px 30px rgba(22,135,255,.25);
+      transition: transform .2s ease, filter .2s ease;
+    }
+    .button:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .button.small { padding: 9px 15px; border-radius: 10px; font-size: 14px; }
+    .hero {
+      overflow: hidden; position: relative;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,196,0,.12), transparent 30%),
+        radial-gradient(circle at 84% 26%, rgba(22,135,255,.14), transparent 30%);
+    }
+    .hero-inner { max-width: var(--max); min-height: 760px; margin: auto; padding: 92px 24px 70px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 72px; align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--yellow); font-size: 14px; font-weight: 760; text-transform: uppercase; letter-spacing: .08em; }
+    .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 14px var(--green); }
+    h1 { font-size: clamp(52px, 6vw, 78px); letter-spacing: -.055em; line-height: .98; margin: 22px 0; }
+    .lead { color: #c2c6ca; font-size: 21px; line-height: 1.55; max-width: 590px; }
+    .hero-actions { display: flex; align-items: center; gap: 18px; margin-top: 32px; flex-wrap: wrap; }
+    .price { font-weight: 760; color: var(--green); }
+    .compatibility { margin-top: 18px; color: var(--muted); font-size: 13px; }
+    .hero-shot { position: relative; justify-self: center; width: min(100%, 410px); }
+    .hero-shot::before { content: ""; position: absolute; inset: 13% -15%; background: linear-gradient(135deg, rgba(255,196,0,.22), rgba(255,122,22,.08), rgba(22,135,255,.16)); filter: blur(55px); border-radius: 50%; }
+    .hero-shot img { position: relative; filter: drop-shadow(0 35px 55px rgba(0,0,0,.55)); }
+    .section { max-width: var(--max); margin: auto; padding: 105px 24px; }
+    .section-heading { max-width: 720px; margin-bottom: 50px; }
+    h2 { font-size: clamp(36px, 4vw, 54px); line-height: 1.04; letter-spacing: -.045em; margin: 10px 0 18px; }
+    .section-heading p, .feature-copy p { color: var(--muted); font-size: 18px; line-height: 1.6; }
+    .features { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .feature-card { min-height: 220px; padding: 25px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018)); }
+    .feature-card .icon { font-size: 26px; }
+    .feature-card h3 { margin: 22px 0 10px; font-size: 19px; }
+    .feature-card p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 15px; }
+    .showcase { display: grid; grid-template-columns: .86fr 1.14fr; gap: 70px; align-items: center; }
+    .showcase.reverse { grid-template-columns: 1.16fr .84fr; }
+    .showcase-image { background: linear-gradient(145deg, #1c2024, #101214); border: 1px solid var(--line); border-radius: 30px; padding: 28px; overflow: hidden; }
+    .showcase-image img { margin: auto; max-height: 690px; filter: drop-shadow(0 25px 35px rgba(0,0,0,.35)); }
+    .context-shot { aspect-ratio: 1.28; object-fit: cover; object-position: 29% 7%; border-radius: 18px; }
+    .feature-copy h2 { margin-top: 0; }
+    .points { display: grid; gap: 18px; margin-top: 30px; }
+    .point { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; }
+    .point-badge { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: rgba(34,203,98,.14); color: var(--green); font-weight: 800; }
+    .point strong { display: block; margin: 3px 0 4px; }
+    .point span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .themes { background: #f3f3f1; color: #202226; overflow: hidden; }
+    .themes .section { padding-bottom: 0; }
+    .themes .section-heading p { color: #666b70; }
+    .theme-pair { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 30px; max-height: 650px; overflow: hidden; }
+    .theme-pair img { width: 100%; filter: drop-shadow(0 25px 40px rgba(0,0,0,.18)); }
+    .install { display: grid; grid-template-columns: .8fr 1.2fr; gap: 70px; align-items: center; }
+    .steps { display: grid; gap: 12px; counter-reset: step; }
+    .step { counter-increment: step; display: grid; grid-template-columns: 44px 1fr; gap: 16px; padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+    .step::before { content: counter(step); width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: var(--panel-2); color: var(--yellow); font-weight: 800; }
+    .step strong { display: block; margin: 1px 0 6px; }
+    .step span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .cta { text-align: center; padding: 100px 24px; background: radial-gradient(circle at 50% 100%, rgba(255,196,0,.14), transparent 45%); border-top: 1px solid var(--line); }
+    .cta h2 { max-width: 760px; margin: 0 auto 18px; }
+    .cta p { color: var(--muted); margin-bottom: 28px; }
+    footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    footer .inner { max-width: var(--max); margin: auto; padding: 28px 24px; display: flex; justify-content: space-between; gap: 20px; }
+    @media (max-width: 900px) {
+      .nav-links a:not(.button) { display: none; }
+      .hero-inner, .showcase, .showcase.reverse, .install { grid-template-columns: 1fr; }
+      .hero-inner { text-align: center; padding-top: 72px; gap: 40px; }
+      .lead { margin-inline: auto; }
+      .hero-actions { justify-content: center; }
+      .features { grid-template-columns: 1fr 1fr; }
+      .showcase.reverse .feature-copy { order: -1; }
+    }
+    @media (max-width: 560px) {
+      .brand { font-size: 14px; }
+      .nav-inner { padding-inline: 16px; }
+      .hero-inner, .section { padding-left: 18px; padding-right: 18px; }
+      .hero-inner { min-height: auto; }
+      h1 { font-size: 48px; }
+      .lead { font-size: 18px; }
+      .features, .theme-pair { grid-template-columns: 1fr; }
+      .theme-pair { max-height: 820px; }
+      .theme-pair img:first-child { display: none; }
+      .showcase-image { padding: 12px; border-radius: 20px; }
+      footer .inner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Navigation principale">
+    <div class="nav-inner">
+      <img src="icon.png" alt="">
+      <span class="brand">SolarFlow Monitor</span>
+      <div class="nav-links">
+        <a href="#fonctions">Fonctions</a>
+        <a href="#apparence">Apparence</a>
+        <a href="#installation">Installation</a>
+        <a class="button small" href="https://github.com/stephsabb/solarflow-monitor/releases/latest/download/SolarFlow-Monitor-App.zip">Télécharger</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow">Application macOS gratuite</span>
+          <h1>Votre énergie.<br>Un coup d’œil suffit.</h1>
+          <p class="lead">SolarFlow Monitor réunit vos panneaux Zendure, vos batteries, votre consommation Shelly et la météo dans une app discrète, directement dans la barre des menus de votre Mac.</p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/stephsabb/solarflow-monitor/releases/latest/download/SolarFlow-Monitor-App.zip">↓ Télécharger gratuitement</a>
+            <span class="price">0 € · Sans abonnement</span>
+          </div>
+          <p class="compatibility">macOS 15 ou ultérieur · Apple Silicon · Signée et notarifiée par Apple · Mises à jour intégrées</p>
+        </div>
+        <figure class="hero-shot">
+          <img src="assets/solarflow-dashboard-dark.png" alt="Écran principal de SolarFlow Monitor en mode sombre">
+        </figure>
+      </div>
+    </header>
+
+    <section class="section" id="fonctions">
+      <div class="section-heading">
+        <span class="eyebrow">Tout au même endroit</span>
+        <h2>Comprenez votre installation en temps réel.</h2>
+        <p>Les informations essentielles sont mises à jour chaque minute, sans ouvrir plusieurs applications ni chercher dans des menus complexes.</p>
+      </div>
+      <div class="features">
+        <article class="feature-card"><span class="icon">☀️</span><h3>Production solaire</h3><p>Suivez instantanément la puissance produite par vos deux SolarFlow et son évolution sur 24 heures.</p></article>
+        <article class="feature-card"><span class="icon">🔋</span><h3>Batteries</h3><p>Visualisez le niveau moyen, les phases de charge et de décharge ainsi que l’énergie stockée.</p></article>
+        <article class="feature-card"><span class="icon">🏠</span><h3>Maison & réseau</h3><p>Avec Shelly, mesurez la consommation totale, l’import réseau et l’injection vers le réseau.</p></article>
+        <article class="feature-card"><span class="icon">🌤️</span><h3>Météo & prévision</h3><p>Anticipez la production du jour grâce à Open‑Meteo et à l’historique réel de votre installation.</p></article>
+      </div>
+    </section>
+
+    <section class="section showcase">
+      <div class="showcase-image"><img class="context-shot" src="assets/solarflow-menubar-context.png" alt="SolarFlow Monitor ouvert depuis la barre des menus de macOS"></div>
+      <div class="feature-copy">
+        <span class="eyebrow">Toujours à portée de clic</span>
+        <h2>Conçue pour vivre dans la barre des menus.</h2>
+        <p>Production, charge moyenne des batteries et consommation actuelle restent visibles sans encombrer votre bureau. Ouvrez le panneau pour accéder aux courbes détaillées.</p>
+        <div class="points">
+          <div class="point"><div class="point-badge">✓</div><div><strong>Discrète</strong><span>Pas d’icône permanente dans le Dock, seulement l’information utile en haut de l’écran.</span></div></div>
+          <div class="point"><div class="point-badge">✓</div><div><strong>À distance</strong><span>Les accès cloud Zendure et Shelly permettent de consulter votre installation où que soit votre Mac.</span></div></div>
+          <div class="point"><div class="point-badge">✓</div><div><strong>Automatique</strong><span>Actualisation chaque minute hors veille et nouvelles versions proposées directement dans l’app.</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section showcase reverse">
+      <div class="feature-copy">
+        <span class="eyebrow">Historique & analyse</span>
+        <h2>Du direct à la tendance.</h2>
+        <p>Comparez l’énergie solaire, la consommation totale de la maison et la production des panneaux sur 7 jours, un mois ou une année. La prévision du jour complète automatiquement l’histogramme.</p>
+        <div class="points">
+          <div class="point"><div class="point-badge">7j</div><div><strong>Trois horizons</strong><span>Basculez entre semaine, mois et année pour comprendre l’effet de la météo et des saisons.</span></div></div>
+          <div class="point"><div class="point-badge">↗</div><div><strong>Aide au dimensionnement</strong><span>Analysez l’usage des batteries, les surplus et les périodes d’import pour évaluer votre installation.</span></div></div>
+        </div>
+      </div>
+      <div class="showcase-image"><img src="assets/solarflow-history-dark.png" alt="Historique énergétique de SolarFlow Monitor en mode sombre"></div>
+    </section>
+
+    <section class="themes" id="apparence">
+      <div class="section">
+        <div class="section-heading">
+          <span class="eyebrow">Naturellement macOS</span>
+          <h2>Clair le jour. Sombre le soir.</h2>
+          <p>SolarFlow Monitor s’adapte automatiquement à l’apparence de votre Mac. Vous pouvez aussi imposer le mode clair ou sombre depuis l’onglet Interface.</p>
+        </div>
+        <div class="theme-pair">
+          <img src="assets/solarflow-dashboard-dark.png" alt="SolarFlow Monitor en mode sombre">
+          <img src="assets/solarflow-dashboard-light.png" alt="SolarFlow Monitor en mode clair">
+        </div>
+      </div>
+    </section>
+
+    <section class="section install" id="installation">
+      <div class="feature-copy">
+        <span class="eyebrow">Prête en quelques minutes</span>
+        <h2>Téléchargez.<br>Déplacez. Lancez.</h2>
+        <p>L’application est gratuite, signée et notarifiée par Apple. Vos identifiants sont conservés dans le trousseau sécurisé de macOS.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div><strong>Téléchargez l’archive</strong><span>Ouvrez le fichier ZIP pour obtenir SolarFlow Monitor.app.</span></div></div>
+        <div class="step"><div><strong>Déplacez l’app dans Applications</strong><span>Cette étape est indispensable pour permettre les mises à jour automatiques.</span></div></div>
+        <div class="step"><div><strong>Configurez vos services</strong><span>Renseignez Zendure, Shelly et votre ville. Vous gardez le contrôle de chaque intégration.</span></div></div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Votre installation solaire mérite un tableau de bord à sa hauteur.</h2>
+      <p>SolarFlow Monitor est gratuit, sans abonnement et conçu pour macOS.</p>
+      <a class="button" href="https://github.com/stephsabb/solarflow-monitor/releases/latest/download/SolarFlow-Monitor-App.zip">↓ Télécharger SolarFlow Monitor</a>
+    </section>
+  </main>
+
+  <footer><div class="inner"><span>© 2026 SolarFlow Monitor</span><span>Projet indépendant · Zendure, Shelly et Open‑Meteo restent la propriété de leurs détenteurs respectifs.</span></div></footer>
+</body>
+</html>
