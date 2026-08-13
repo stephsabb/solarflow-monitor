@@ -6,6 +6,16 @@
         <description>Mises à jour de SolarFlow Monitor</description>
         <language>fr</language>
         <item>
+            <title>5.40</title>
+            <pubDate>Thu, 13 Aug 2026 20:16:09 +0200</pubDate>
+            <link>https://stephsabb.github.io/solarflow-monitor/</link>
+            <sparkle:version>69</sparkle:version>
+            <sparkle:shortVersionString>5.40</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/stephsabb/solarflow-monitor/releases/download/v5.40/SolarFlow-Monitor-App.zip" length="3716744" type="application/octet-stream" sparkle:edSignature="DS0JkdUfO5rfpKvjhhqggHlH/1vHEMjAOU+KVM/yw910HnEf/Eb8xH4uPCU7/VyOxyM2p+mDZIrBz+3gT24gCQ=="/>
+        </item>
+        <item>
             <title>5.39</title>
             <pubDate>Thu, 13 Aug 2026 13:55:14 +0200</pubDate>
             <link>https://stephsabb.github.io/solarflow-monitor/</link>
