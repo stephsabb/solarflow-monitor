@@ -117,9 +117,9 @@ actor ZendureHistoryService {
             throw apiError(object, fallback: "La liste des appareils Zendure est illisible.")
         }
         return devices.compactMap { device in
-            let label = [string(device["productName"]), string(device["name"]), string(device["productModel"])]
-                .compactMap { $0 }.joined(separator: " ").lowercased().replacingOccurrences(of: " ", with: "")
-            guard label.contains("solarflow800") else { return nil }
+            guard ZendureSolarFlow.matches(
+                string(device["productName"]), string(device["name"]), string(device["productModel"])
+            ) else { return nil }
             return string(device["id"])
         }
     }

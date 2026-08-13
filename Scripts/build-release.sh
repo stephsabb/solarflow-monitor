@@ -9,6 +9,8 @@ cp .build/release/SolarFlowMonitor "$app/Contents/MacOS/SolarFlowMonitor"
 install_name_tool -add_rpath @executable_path/../Frameworks "$app/Contents/MacOS/SolarFlowMonitor" 2>/dev/null || true
 cp work/Info.plist "$app/Contents/Info.plist"
 cp work/AppIcon.icns "$app/Contents/Resources/AppIcon.icns"
+cp work/EnergyFlowHouseLight.png "$app/Contents/Resources/EnergyFlowHouseLight.png"
+cp work/EnergyFlowHouseDark.png "$app/Contents/Resources/EnergyFlowHouseDark.png"
 ditto .build/release/Sparkle.framework "$app/Contents/Frameworks/Sparkle.framework"
 identity="${DEVELOPER_ID_APPLICATION:-}"
 if [[ -n "$identity" ]]; then

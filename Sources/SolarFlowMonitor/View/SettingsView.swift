@@ -6,7 +6,7 @@ struct SettingsView: View {
         case solar = "Équipement solaire"
         case home = "Énergie"
         case weather = "Météo"
-        case interface = "Interface"
+        case interface = "Application"
         var id: Self { self }
         var icon: String {
             switch self {
@@ -21,7 +21,7 @@ struct SettingsView: View {
             case .solar: "Solaire"
             case .home: "Énergie"
             case .weather: "Météo"
-            case .interface: "Interface"
+            case .interface: "Application"
             }
         }
     }
@@ -57,7 +57,7 @@ struct SettingsView: View {
                                     .lineLimit(1)
                                     .frame(height: 13)
                             }
-                            .foregroundStyle(selectedTab == tab ? Color.accentColor : Color.secondary)
+                            .foregroundStyle(selectedTab == tab ? Color.orange : Color.secondary)
                             .frame(maxWidth: .infinity, minHeight: 45)
                             .contentShape(Rectangle())
                             .background {
@@ -110,6 +110,7 @@ struct SettingsView: View {
         }
         .frame(width: 360, height: 575, alignment: .top)
         .background(Color(nsColor: .windowBackgroundColor))
+        .tint(.orange)
     }
 
     private var solarTab: some View {

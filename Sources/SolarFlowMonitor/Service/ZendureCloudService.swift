@@ -85,19 +85,14 @@ actor ZendureCloudService: SolarFlowService {
         guard !available.isEmpty, let updated = lastMessageByDevice.values.max() else {
             throw SolarFlowServiceError.invalidConfiguration("Connexion établie, mais aucune mesure reçue. Vérifiez que l’appareil est en ligne.")
         }
-        let solar = available.reduce(0) { $0 + $1["solarInputPower", default: 0] }
-        let home = available.reduce(0) { $0 + $1["outputHomePower", default: 0] }
-        let charge = available.reduce(0) { $0 + $1["outputPackPower", default: 0] }
-        let discharge = available.reduce(0) { $0 + $1["packInputPower", default: 0] }
-        let levels = available.compactMap { $0["electricLevel"] }
-        let level = levels.isEmpty ? 0 : levels.reduce(0, +) / levels.count
+        let aggregate = ZendureSolarFlow.aggregate(available, updatedAt: updated)
         return SolarFlowSnapshot(
-            solarPowerWatts: solar,
-            homePowerWatts: home,
-            batteryLevelPercent: level,
-            batteryPowerWatts: charge - discharge,
+            solarPowerWatts: aggregate.solarPowerWatts,
+            homePowerWatts: aggregate.homePowerWatts,
+            batteryLevelPercent: aggregate.batteryLevelPercent,
+            batteryPowerWatts: aggregate.batteryPowerWatts,
             connectionState: available.count == devices.count ? .connected : .disconnected,
-            updatedAt: updated
+            updatedAt: aggregate.updatedAt
         )
     }
 
@@ -138,12 +133,9 @@ actor ZendureCloudService: SolarFlowService {
         guard envelope.code == 200, envelope.success, let payload = envelope.data else {
             throw SolarFlowServiceError.invalidConfiguration(envelope.msg ?? "Clé refusée par Zendure.")
         }
-        let supported = payload.deviceList.filter {
-            let name = $0.productModel.lowercased().replacingOccurrences(of: " ", with: "")
-            return name.contains("solarflow800")
-        }
+        let supported = payload.deviceList.filter { ZendureSolarFlow.matches($0.productModel) }
         guard !supported.isEmpty else {
-            throw SolarFlowServiceError.invalidConfiguration("Aucun SolarFlow 800 compatible trouvé sur ce compte.")
+            throw SolarFlowServiceError.invalidConfiguration("Aucun contrôleur SolarFlow compatible trouvé sur ce compte.")
         }
         devices = supported
 
@@ -179,48 +171,13 @@ actor ZendureCloudService: SolarFlowService {
         var deviceValues = valuesByDevice[deviceID, default: [:]]
         let dataObject = (object["data"] as? [String: Any]) ?? object
         let properties = (dataObject["properties"] as? [String: Any]) ?? dataObject
-        let aliases: [String: [String]] = [
-            "solarInputPower": ["solarInputPower", "pvPower", "solarPower"],
-            "outputHomePower": ["outputHomePower", "homePower", "homeLoad"],
-            "electricLevel": ["electricLevel", "soc", "socLevel"],
-            "outputPackPower": ["outputPackPower", "batteryChargePower"],
-            "packInputPower": ["packInputPower", "batteryDischargePower"]
-        ]
-        for (canonical, names) in aliases {
-            for name in names {
-                if let value = integer(properties[name]) {
-                    deviceValues[canonical] = value
-                    break
-                }
-            }
-        }
-        // Some firmware reports pack power only in packData.
-        if let packs = dataObject["packData"] as? [[String: Any]], !packs.isEmpty {
-            var charge = 0
-            var discharge = 0
-            for pack in packs {
-                let power = integer(pack["power"]) ?? 0
-                switch integer(pack["state"]) {
-                case 1: charge += abs(power)
-                case 2: discharge += abs(power)
-                default: break
-                }
-            }
-            if properties["outputPackPower"] == nil { deviceValues["outputPackPower"] = charge }
-            if properties["packInputPower"] == nil { deviceValues["packInputPower"] = discharge }
-        }
+        deviceValues.merge(ZendureSolarFlow.canonicalValues(properties: properties, data: dataObject)) { _, new in new }
         if !deviceValues.isEmpty {
             valuesByDevice[deviceID] = deviceValues
             lastMessageByDevice[deviceID] = .now
         }
     }
 
-    private func integer(_ value: Any?) -> Int? {
-        if let number = value as? NSNumber { return number.intValue }
-        if let string = value as? String { return Int(Double(string) ?? .nan) }
-        if let wrapped = value as? [String: Any] { return integer(wrapped["value"]) }
-        return nil
-    }
 }
 
 private struct MQTTEndpoint {

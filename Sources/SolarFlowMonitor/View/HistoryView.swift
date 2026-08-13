@@ -17,6 +17,7 @@ struct HistoryView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .tint(.orange)
                     .labelsHidden()
                     .frame(width: 220)
                     .disabled(model.isLoadingHistory)
