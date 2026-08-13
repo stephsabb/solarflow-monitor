@@ -72,6 +72,17 @@
     .feature-card .icon { font-size: 26px; }
     .feature-card h3 { margin: 22px 0 10px; font-size: 19px; }
     .feature-card p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 15px; }
+    .compat-section { padding-top: 30px; }
+    .compat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .compat-card { padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
+    .compat-card .family { display: inline-flex; align-items: center; gap: 9px; color: var(--yellow); font-size: 13px; font-weight: 760; text-transform: uppercase; letter-spacing: .06em; }
+    .compat-card h3 { margin: 16px 0 13px; font-size: 22px; }
+    .model-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .model-list li { padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.045); color: #d7dade; font-size: 14px; }
+    .compat-note { display: grid; grid-template-columns: 34px 1fr; gap: 14px; margin-top: 18px; padding: 20px 22px; border: 1px solid rgba(255,122,22,.28); border-radius: 18px; background: rgba(255,122,22,.07); }
+    .compat-note .note-icon { color: var(--orange); font-size: 22px; }
+    .compat-note strong { display: block; margin-bottom: 5px; }
+    .compat-note p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .showcase { display: grid; grid-template-columns: .86fr 1.14fr; gap: 70px; align-items: center; }
     .showcase.reverse { grid-template-columns: 1.16fr .84fr; }
     .showcase-image { background: linear-gradient(145deg, #1c2024, #101214); border: 1px solid var(--line); border-radius: 30px; padding: 28px; overflow: hidden; }
@@ -110,6 +121,7 @@
       .lead { margin-inline: auto; }
       .hero-actions { justify-content: center; }
       .features { grid-template-columns: 1fr 1fr; }
+      .compat-grid { grid-template-columns: 1fr; }
       .screen-grid { grid-template-columns: 1fr 1fr; }
       .showcase.reverse .feature-copy { order: -1; }
     }
@@ -136,6 +148,7 @@
       <span class="brand">SolarFlow Monitor</span>
       <div class="nav-links">
         <a href="#fonctions">Fonctions</a>
+        <a href="#compatibilite">Compatibilité</a>
         <a href="#apparence">Apparence</a>
         <a href="#installation">Installation</a>
         <a href="https://github.com/stephsabb/solarflow-monitor">GitHub</a>
@@ -177,6 +190,55 @@
       </div>
     </section>
 
+    <section class="section compat-section" id="compatibilite">
+      <div class="section-heading">
+        <span class="eyebrow">Compatibilité SolarFlow</span>
+        <h2>Une seule app pour toute votre installation Zendure.</h2>
+        <p>SolarFlow Monitor détecte les contrôleurs SolarFlow associés à votre compte et additionne automatiquement la puissance de leurs panneaux, de leurs sorties et de leurs batteries.</p>
+      </div>
+      <div class="compat-grid">
+        <article class="compat-card">
+          <span class="family">☀︎ Série 800</span>
+          <h3>SolarFlow compact</h3>
+          <ul class="model-list">
+            <li>SolarFlow 800</li>
+            <li>SolarFlow 800 Pro</li>
+            <li>SolarFlow 800 Pro 2</li>
+            <li>SolarFlow 800 Plus</li>
+          </ul>
+        </article>
+        <article class="compat-card">
+          <span class="family">⚡ Gamme AC & Mix</span>
+          <h3>SolarFlow haute puissance</h3>
+          <ul class="model-list">
+            <li>SolarFlow 1600 AC+</li>
+            <li>SolarFlow 2400 AC</li>
+            <li>SolarFlow 2400 AC+</li>
+            <li>SolarFlow 2400 Pro</li>
+            <li>SolarFlow 3000 Mix</li>
+            <li>SolarFlow 4000</li>
+          </ul>
+        </article>
+        <article class="compat-card">
+          <span class="family">⌂ Autres générations</span>
+          <h3>Hubs & systèmes intégrés</h3>
+          <ul class="model-list">
+            <li>Hyper 2000</li>
+            <li>Hub 1200</li>
+            <li>Hub 2000</li>
+            <li>AIO 2400</li>
+          </ul>
+        </article>
+      </div>
+      <div class="compat-note">
+        <span class="note-icon">ⓘ</span>
+        <div>
+          <strong>Batteries associées incluses, sans double comptage</strong>
+          <p>Les batteries et modules satellites sont pris en compte à travers leur contrôleur SolarFlow. Les mesures en direct sont agrégées pour tous les appareils détectés ; la disponibilité et le niveau de détail de l’historique Zendure peuvent varier selon le modèle, le firmware et le compte.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="section showcase">
       <div class="showcase-image"><img class="context-shot" src="assets/solarflow-menubar-context-v2.png" alt="SolarFlow Monitor ouvert depuis la barre des menus de macOS"></div>
       <div class="feature-copy">
@@ -209,7 +271,7 @@
         <div class="section-heading">
           <span class="eyebrow">Naturellement macOS</span>
           <h2>Clair le jour. Sombre le soir.</h2>
-          <p>SolarFlow Monitor s’adapte automatiquement à l’apparence de votre Mac. Vous pouvez aussi imposer le mode clair ou sombre depuis l’onglet Interface.</p>
+          <p>SolarFlow Monitor s’adapte automatiquement à l’apparence de votre Mac. Vous pouvez aussi imposer le mode clair ou sombre depuis l’onglet Application.</p>
         </div>
         <div class="theme-pair">
           <img src="assets/solarflow-flow-dark.png" alt="Vue Flux de SolarFlow Monitor en mode sombre">
