@@ -178,7 +178,7 @@ private struct EnergyFlowView: View {
             let hub = CGPoint(x: size.width * 0.49, y: size.height * 0.61)
             let solarPoint = CGPoint(x: size.width / 2, y: 47)
             let gridPoint = CGPoint(x: 55, y: size.height - 76)
-            let homePoint = CGPoint(x: size.width - 55, y: 62)
+            let homePoint = CGPoint(x: size.width - 55, y: 76)
             let batteryPoint = CGPoint(x: size.width - 58, y: size.height - 48)
 
             ZStack {
@@ -191,9 +191,8 @@ private struct EnergyFlowView: View {
                 }
 
                 EnergyFlowCables(cables: [
-                    .init(points: [CGPoint(x: size.width * 0.50, y: size.height * 0.30), hub], color: .yellow, watts: solar, reversed: false),
+                    .init(points: [CGPoint(x: size.width * 0.50, y: size.height * 0.395), hub], color: .yellow, watts: solar, reversed: false),
                     .init(points: [CGPoint(x: size.width * 0.065, y: size.height * 0.70), CGPoint(x: size.width * 0.065, y: size.height * 0.77), CGPoint(x: size.width * 0.40, y: size.height * 0.77), hub], color: .blue, watts: abs(grid), reversed: grid < 0),
-                    .init(points: [hub, CGPoint(x: size.width * 0.69, y: size.height * 0.61), CGPoint(x: size.width * 0.76, y: size.height * 0.48)], color: .orange, watts: home, reversed: false),
                     .init(points: [hub, CGPoint(x: size.width * 0.61, y: size.height * 0.68), CGPoint(x: size.width * 0.82, y: size.height * 0.625)], color: .cyan, watts: abs(battery), reversed: battery < 0)
                 ])
 
@@ -201,7 +200,7 @@ private struct EnergyFlowView: View {
                     .position(solarPoint)
                 FlowNode(title: grid >= 0 ? "Depuis réseau" : "Vers réseau", value: "\(abs(grid)) W")
                     .position(gridPoint)
-                FlowNode(title: "Maison", value: "\(home) W")
+                FlowNode(title: "Maison", value: "\(home) W", color: .orange)
                     .position(homePoint)
                 FlowNode(title: battery > 0 ? "En charge" : battery < 0 ? "En décharge" : "Batterie", value: batteryValue)
                     .position(batteryPoint)
@@ -238,6 +237,7 @@ private struct EnergyFlowView: View {
 private struct FlowNode: View {
     let title: String
     let value: String
+    var color: Color?
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -247,7 +247,7 @@ private struct FlowNode: View {
                 .lineLimit(1).minimumScaleFactor(0.65)
             Text(title).font(.caption2).opacity(0.72).lineLimit(1)
         }
-        .foregroundStyle(colorScheme == .dark ? Color(white: 0.82) : Color(white: 0.22))
+        .foregroundStyle(color ?? (colorScheme == .dark ? Color(white: 0.82) : Color(white: 0.22)))
         .frame(width: 108, height: 50)
         .shadow(color: Color(nsColor: .windowBackgroundColor).opacity(0.95), radius: 3)
     }
@@ -263,7 +263,7 @@ private struct EnergyFlowCables: View {
     let cables: [Cable]
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.5)) { timeline in
+        TimelineView(.periodic(from: .now, by: 0.08)) { timeline in
             Canvas { context, _ in
                 for cable in cables {
                     draw(cable, at: timeline.date, in: &context)
@@ -275,36 +275,94 @@ private struct EnergyFlowCables: View {
     }
 
     private func draw(_ cable: Cable, at date: Date, in context: inout GraphicsContext) {
-        guard let first = cable.points.first else { return }
-        var path = Path()
-        path.move(to: first)
-        for point in cable.points.dropFirst() { path.addLine(to: point) }
-        context.stroke(path, with: .color(cable.color.opacity(cable.watts == 0 ? 0.14 : 0.40)), lineWidth: 3)
+        let renderedPoints = roundedPoints(through: cable.points, radius: 12)
+        let path = path(through: renderedPoints)
+        context.stroke(
+            path,
+            with: .color(cable.color.opacity(cable.watts == 0 ? 0.14 : 0.34)),
+            style: StrokeStyle(lineWidth: 4.2, lineCap: .round, lineJoin: .round)
+        )
         guard cable.watts > 0 else { return }
         let speed = min(0.20, 0.055 + Double(cable.watts) / 10_000.0)
         let base = date.timeIntervalSinceReferenceDate * speed
         for index in 0..<3 {
-            var progress = (base + Double(index) / 3).truncatingRemainder(dividingBy: 1)
-            if cable.reversed { progress = 1 - progress }
-            let sample = sample(at: progress, on: cable.points)
-            let direction: CGFloat = cable.reversed ? -1 : 1
-            let dx = sample.direction.dx * direction
-            let dy = sample.direction.dy * direction
-            let tipDistance: CGFloat = 3.6
-            let backDistance: CGFloat = 3
-            let wing: CGFloat = 3
-            let tip = CGPoint(x: sample.point.x + dx * tipDistance, y: sample.point.y + dy * tipDistance)
-            let back = CGPoint(x: sample.point.x - dx * backDistance, y: sample.point.y - dy * backDistance)
-            let left = CGPoint(x: back.x - dy * wing, y: back.y + dx * wing)
-            let right = CGPoint(x: back.x + dy * wing, y: back.y - dx * wing)
-            var arrow = Path()
-            arrow.move(to: tip)
-            arrow.addLine(to: left)
-            arrow.addLine(to: right)
-            arrow.addLine(to: tip)
-            arrow.closeSubpath()
-            context.fill(arrow, with: .color(cable.color))
+            let phase = normalized(base + Double(index) / 3)
+            let head = cable.reversed ? normalized(1 - phase) : phase
+            drawTrail(head: head, reversed: cable.reversed, points: renderedPoints, color: cable.color, in: &context)
         }
+    }
+
+    private func drawTrail(head: Double, reversed: Bool, points: [CGPoint], color: Color, in context: inout GraphicsContext) {
+        let segmentCount = 18
+        let trailLength = 0.105
+        let direction = reversed ? -1.0 : 1.0
+        for index in 0..<segmentCount {
+            let startOffset = trailLength * Double(index + 1) / Double(segmentCount)
+            let endOffset = trailLength * Double(index) / Double(segmentCount)
+            let startProgress = normalized(head - direction * startOffset)
+            let endProgress = normalized(head - direction * endOffset)
+            guard abs(startProgress - endProgress) < 0.5 else { continue }
+            let start = sample(at: startProgress, on: points).point
+            let end = sample(at: endProgress, on: points).point
+            let brightness = 1 - Double(index) / Double(segmentCount)
+            var segment = Path()
+            segment.move(to: start)
+            segment.addLine(to: end)
+            context.stroke(
+                segment,
+                with: .color(color.opacity(0.13 * brightness)),
+                style: StrokeStyle(lineWidth: 9, lineCap: .round, lineJoin: .round)
+            )
+            context.stroke(
+                segment,
+                with: .color(color.opacity(0.18 + 0.82 * brightness * brightness)),
+                style: StrokeStyle(lineWidth: 3.4, lineCap: .round, lineJoin: .round)
+            )
+        }
+    }
+
+    private func path(through points: [CGPoint]) -> Path {
+        var path = Path()
+        guard let first = points.first else { return path }
+        path.move(to: first)
+        for point in points.dropFirst() { path.addLine(to: point) }
+        return path
+    }
+
+    private func roundedPoints(through points: [CGPoint], radius: CGFloat) -> [CGPoint] {
+        guard points.count > 2 else { return points }
+        var result = [points[0]]
+        for index in 1..<(points.count - 1) {
+            let previous = points[index - 1], corner = points[index], next = points[index + 1]
+            let incoming = hypot(corner.x - previous.x, corner.y - previous.y)
+            let outgoing = hypot(next.x - corner.x, next.y - corner.y)
+            let distance = min(radius, incoming / 2, outgoing / 2)
+            guard incoming > 0, outgoing > 0 else { continue }
+            let entry = CGPoint(
+                x: corner.x - (corner.x - previous.x) / incoming * distance,
+                y: corner.y - (corner.y - previous.y) / incoming * distance
+            )
+            let exit = CGPoint(
+                x: corner.x + (next.x - corner.x) / outgoing * distance,
+                y: corner.y + (next.y - corner.y) / outgoing * distance
+            )
+            result.append(entry)
+            for step in 1...8 {
+                let t = CGFloat(step) / 8
+                let inverse = 1 - t
+                result.append(CGPoint(
+                    x: inverse * inverse * entry.x + 2 * inverse * t * corner.x + t * t * exit.x,
+                    y: inverse * inverse * entry.y + 2 * inverse * t * corner.y + t * t * exit.y
+                ))
+            }
+        }
+        if let last = points.last { result.append(last) }
+        return result
+    }
+
+    private func normalized(_ value: Double) -> Double {
+        let remainder = value.truncatingRemainder(dividingBy: 1)
+        return remainder < 0 ? remainder + 1 : remainder
     }
 
     private func sample(at progress: Double, on points: [CGPoint]) -> (point: CGPoint, direction: CGVector) {
